@@ -236,14 +236,18 @@ extension NetworkViewControllerDetail {
         FileSharingManager.generateFileAndShare(text: logText, fileName: fileName)
     }
 
-    @objc private func copyCurlButtonTapped() {
-        let curlCommand = """
-            curl -X \(model.method ?? "") \\
-                 -H "\(model.requestHeaderFields?.formattedCurlString() ?? "")" \\
-                 -d "\(model.requestData?.formattedCurlString() ?? "")" \\
-                 \(model.url?.absoluteString ?? "")
-        """
-        UIPasteboard.general.string = curlCommand
+     @objc private func copyCurlButtonTapped() {
+            guard let url = model.url, let method = model.method else { return }
+            var request = URLRequest(url: url)
+            request.httpMethod = method
+            if let headers = model.requestHeaderFields as? [String: String] {
+                for (key, value) in headers {
+                    request.setValue(value, forHTTPHeaderField: key)
+                }
+            }
+            request.httpBody = model.requestData
+            let curlCommand = request.cURLCommandLineWithSession(nil)
+            UIPasteboard.general.string = curlCommand
     }
     
     @objc private func replayButtonTapped() {
