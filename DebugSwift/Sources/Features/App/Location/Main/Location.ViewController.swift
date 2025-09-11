@@ -10,6 +10,73 @@ import Foundation
 import UIKit
 
 final class LocationViewController: BaseController {
+    // Manual Lat/Long Entry UI
+    private lazy var manualEntryView: UIView = {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+        container.backgroundColor = UIColor(white: 0.1, alpha: 1)
+        container.layer.cornerRadius = 8
+
+        let latField = UITextField()
+        latField.placeholder = "Latitude"
+        latField.keyboardType = .decimalPad
+        latField.borderStyle = .roundedRect
+        latField.translatesAutoresizingMaskIntoConstraints = false
+        latField.tag = 1
+
+        let lonField = UITextField()
+        lonField.placeholder = "Longitude"
+        lonField.keyboardType = .decimalPad
+        lonField.borderStyle = .roundedRect
+        lonField.translatesAutoresizingMaskIntoConstraints = false
+        lonField.tag = 2
+
+        let setButton = UIButton(type: .system)
+        setButton.setTitle("Set Custom Location", for: .normal)
+        setButton.translatesAutoresizingMaskIntoConstraints = false
+        setButton.backgroundColor = .systemGreen
+        setButton.setTitleColor(.white, for: .normal)
+        setButton.layer.cornerRadius = 6
+        setButton.addTarget(self, action: #selector(setCustomLocationTapped), for: .touchUpInside)
+
+        container.addSubview(latField)
+        container.addSubview(lonField)
+        container.addSubview(setButton)
+
+        NSLayoutConstraint.activate([
+            latField.topAnchor.constraint(equalTo: container.topAnchor, constant: 12),
+            latField.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+            latField.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12),
+
+            lonField.topAnchor.constraint(equalTo: latField.bottomAnchor, constant: 8),
+            lonField.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+            lonField.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12),
+
+            setButton.topAnchor.constraint(equalTo: lonField.bottomAnchor, constant: 12),
+            setButton.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+            setButton.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12),
+            setButton.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -12),
+            setButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
+
+        return container
+    }()
+
+    @objc private func setCustomLocationTapped() {
+        guard let latField = manualEntryView.viewWithTag(1) as? UITextField,
+              let lonField = manualEntryView.viewWithTag(2) as? UITextField,
+              let latText = latField.text, let lonText = lonField.text,
+              let latitude = Double(latText), let longitude = Double(lonText) else {
+            let alert = UIAlertController(title: "Invalid Input", message: "Please enter valid latitude and longitude.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            return
+        }
+        LocationToolkit.shared.setCustomLocation(latitude: latitude, longitude: longitude)
+        viewModel.selectedIndex = 0
+        tableView.reloadData()
+        resetButton?.isEnabled = true
+    }
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -33,6 +100,7 @@ final class LocationViewController: BaseController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTable()
+    setupManualEntryView()
     }
 
     func resetLocation() {
@@ -51,12 +119,16 @@ final class LocationViewController: BaseController {
         )
 
         view.addSubview(tableView)
+        view.addSubview(manualEntryView)
 
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: manualEntryView.topAnchor, constant: -8),
+            manualEntryView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            manualEntryView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            manualEntryView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
 
         addRightBarButton(
@@ -69,6 +141,18 @@ final class LocationViewController: BaseController {
 
     func setup() {
         title = "Simulate Location"
+    }
+
+    private func setupManualEntryView() {
+        // Optionally prefill with current simulated location
+        if let location = LocationToolkit.shared.simulatedLocation {
+            if let latField = manualEntryView.viewWithTag(1) as? UITextField {
+                latField.text = String(location.coordinate.latitude)
+            }
+            if let lonField = manualEntryView.viewWithTag(2) as? UITextField {
+                lonField.text = String(location.coordinate.longitude)
+            }
+        }
     }
 }
 

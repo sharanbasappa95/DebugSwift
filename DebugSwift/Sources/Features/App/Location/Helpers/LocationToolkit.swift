@@ -9,6 +9,11 @@ import CoreLocation
 import Foundation
 
 class LocationToolkit: @unchecked Sendable {
+    /// Allows setting a custom location by latitude and longitude, in addition to map selection.
+    func setCustomLocation(latitude: Double, longitude: Double) {
+        let location = CLLocation(latitude: latitude, longitude: longitude)
+        self.simulatedLocation = location
+    }
     static let shared = LocationToolkit()
 
     var simulatedLocation: CLLocation? {
@@ -108,39 +113,76 @@ class LocationToolkit: @unchecked Sendable {
                 longitude: 114.158177
             )
         )
+        // Indian Tier 1 Cities
         presetLocations.append(
             PresetLocation(
-                title: "Honolulu, HI, USA",
-                latitude: 21.282778,
-                longitude: -157.829444
+                title: "Delhi, India",
+                latitude: 28.613939,
+                longitude: 77.209021
             )
         )
         presetLocations.append(
             PresetLocation(
-                title: "San Francisco, CA, USA",
-                latitude: 37.787359,
-                longitude: -122.408227
+                title: "Bangalore, India",
+                latitude: 12.971599,
+                longitude: 77.594566
             )
         )
         presetLocations.append(
             PresetLocation(
-                title: "Mexico City, Mexico",
-                latitude: 19.435478,
-                longitude: -99.136479
+                title: "Chennai, India",
+                latitude: 13.082680,
+                longitude: 80.270718
             )
         )
         presetLocations.append(
             PresetLocation(
-                title: "New York, NY, USA",
-                latitude: 40.759211,
-                longitude: -73.984638
+                title: "Hyderabad, India",
+                latitude: 17.385044,
+                longitude: 78.486671
             )
         )
         presetLocations.append(
             PresetLocation(
-                title: "Rio de Janeiro, Brazil",
-                latitude: -22.903539,
-                longitude: -43.209587
+                title: "Kolkata, India",
+                latitude: 22.572646,
+                longitude: 88.363895
+            )
+        )
+        // Indian Tier 2 Cities
+        presetLocations.append(
+            PresetLocation(
+                title: "Pune, India",
+                latitude: 18.520430,
+                longitude: 73.856744
+            )
+        )
+        presetLocations.append(
+            PresetLocation(
+                title: "Ahmedabad, India",
+                latitude: 23.022505,
+                longitude: 72.571362
+            )
+        )
+        presetLocations.append(
+            PresetLocation(
+                title: "Jaipur, India",
+                latitude: 26.912434,
+                longitude: 75.787270
+            )
+        )
+        presetLocations.append(
+            PresetLocation(
+                title: "Lucknow, India",
+                latitude: 26.846694,
+                longitude: 80.946166
+            )
+        )
+        presetLocations.append(
+            PresetLocation(
+                title: "Coimbatore, India",
+                latitude: 11.016844,
+                longitude: 76.955832
             )
         )
 
